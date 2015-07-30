@@ -3,6 +3,7 @@
 #
 # Authors:
 #   Sorin Ionescu <sorin.ionescu@gmail.com>
+#   Thierry Ghelew <tlux@ghelew.net>
 #
 
 # Return if requirements are not found.
@@ -74,6 +75,18 @@ done
 # Allow command line editing in an external editor.
 autoload -Uz edit-command-line
 zle -N edit-command-line
+
+# Add Surround zsh
+autoload -Uz is-at-least
+if is-at-least 5.0.8; then
+    #surrond function is available
+    autoload -Uz surround
+    zle -N delete-surround surround
+    zle -N delete-surround surround
+    zle -N add-surround surround
+    zle -N change-surround surround
+fi
+unfunction is-at-least 
 
 #
 # Functions
@@ -194,6 +207,7 @@ zle -N expand-or-complete-with-indicator
 
 # Inserts 'sudo ' at the beginning of the line.
 function prepend-sudo {
+  [[ -z $BUFFER ]] && zle up-history
   if [[ "$BUFFER" != su(do|)\ * ]]; then
     BUFFER="sudo $BUFFER"
     (( CURSOR += 5 ))
@@ -241,7 +255,7 @@ fi
 #
 
 # Edit command in an external editor.
-bindkey -M vicmd "v" edit-command-line
+bindkey -M vicmd "^$key_info[Control]E" edit-command-line
 
 # Undo/Redo
 bindkey -M vicmd "u" undo
@@ -254,6 +268,11 @@ else
   bindkey -M vicmd "?" history-incremental-search-backward
   bindkey -M vicmd "/" history-incremental-search-forward
 fi
+# Handle surroung keys
+bindkey -M visual S add-surround
+bindkey -a cs change-surround
+bindkey -a ds delete-surround
+bindkey -a ys add-surround
 
 #
 # Emacs and Vi Key Bindings
