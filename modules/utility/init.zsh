@@ -113,6 +113,7 @@ if zstyle -t ':prezto:module:utility:grep' color; then
 
   alias grep="${aliases[grep]:-grep} --color=auto"
 fi
+alias sgrep='grep -R -n -H -C 5 --exclude-dir={.git,.svn,CVS} '
 
 # Mac OS X Everywhere
 if [[ "$OSTYPE" == darwin* ]]; then
@@ -146,9 +147,23 @@ fi
 # Resource Usage
 alias df='df -kh'
 alias du='du -kh'
+alias dud='du -d 1'
+
+# Command line head / tail shortcuts
+alias -g H='| head'
+alias -g T='| tail'
+alias -g G='| grep'
+alias -g L="| less"
+alias -g M="| most"
+alias -g LL="2>&1 | less"
+alias -g CA="2>&1 | cat -A"
+alias -g NE="2> /dev/null"
+alias -g NUL="> /dev/null 2>&1"
 
 if (( $+commands[htop] )); then
   alias top=htop
+  alias topc='top -s PERCENT_CPU'
+  alias topm='top -s PERCENT_MEM'
 else
   if [[ "$OSTYPE" == (darwin*|*bsd*) ]]; then
     alias topc='top -o cpu'
@@ -196,6 +211,11 @@ function slit {
 # Finds files and executes a command on them.
 function find-exec {
   find . -type f -iname "*${1:-}*" -exec "${2:-file}" '{}' \;
+}
+
+# Find pattern in files located at a given directory
+find-in-files(){
+    grep -rsEl "$2" "$1"
 }
 
 # Displays user owned processes status.

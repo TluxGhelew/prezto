@@ -28,6 +28,15 @@ To disable `make` highlighting, add the following line to *zpreztorc*:
 
     zstyle ':prezto:module:utility:make' color 'no'
 
+### Functions
+
+Additionally setting for some utility functions.
+
+`zrandom` to set the accepted characters which default to `A-Za-z0-9@!~+-` use:
+
+        zstyle ':prezto:module:utility:zrandom' accepted-chars '<chars>'
+
+
 Aliases
 -------
 
@@ -63,19 +72,26 @@ Aliases
 
 ### General
 
-  - `_` executes a command as another user (`sudo`).
-  - `b` opens the default web browser.
-  - `cp` copies files and directories interactively.
-  - `e` opens the default editor.
-  - `ln` links files and directories interactively.
-  - `mkdir` creates directories, including intermediary directories.
-  - `mv` moves files and directories interactively.
-  - `p` opens the default pager.
-  - `po` removes a directory from the stack and changes to it (`popd`).
-  - `pu` changes the directory and pushes the old directory onto the stack
-    (`pushd`).
-  - `rm` removes files and directories interactively.
-  - `type` displays all the attribute values of a shell parameter.
+  - `_`      executes a command as another user (`sudo`).
+  - `b`      opens the default web browser.
+  - `cp`     copies files and directories interactively.
+  - `e`      opens the default editor.
+  - `ln`     links files and directories interactively.
+  - `mkdir`  creates directories, including intermediary directories.
+  - `mv`     moves files and directories interactively.
+  - `p`      opens the default pager.
+  - `po`     removes a directory from the stack and changes to it (`popd`).
+  - `pu`     changes the directory and pushes the old directory onto the stack (`pushd`).
+  - `rm`     removes files and directories interactively.
+  - `type`   displays all the attribute values of a shell parameter.
+  - `al`     alias
+  - `c`      clear the command line
+  - `sgrep` search for pattern using `grep` :
+    * by excluding git like directories(.git,.svn,CVS)
+    * recursively look into folders and following symlinks
+    * printing filename along with the line number
+    * print 5 lines around the matching pattern
+
 
 ### Files and Directories
 
@@ -91,6 +107,18 @@ Aliases
   - `lc` lists sorted by date, most recent last, shows change time.
   - `lu` lists sorted by date, most recent last, shows access time.
   - `sl` lists directory contents (`ls`).
+
+### Command line head/tail shortcuts
+
+  - `H` pipe `head` to the command line
+  - `T` pipe `tail` to the command line
+  - `G` pipe `grep` to the command line
+  - `L` pipe `less` to the command line
+  - `M` pipe `most` to the command line
+  - `LL` append stderr to stdin and pipe `less` to the command line
+  - `CA` append stderr to stdin and pipe `cat -A` to the command line
+  - `NE` append stderr to null
+  - `NUL` append stdin and stderr to null
 
 ### Mac OS X Everywhere
 
@@ -127,6 +155,7 @@ Functions
   - `cdls` changes to a directory and lists its contents.
   - `dut` displays the grand total disk usage using human readable units.
   - `find-exec` finds files and executes a command on them.
+  - `find-in-files` finds pattern in all files i a given repository
   - `mkdcd` makes a directory and changes to it.
   - `popdls` pops an entry off the directory stack and lists its contents.
   - `pushdls` pushes an entry onto the directory stack and lists its contents.
