@@ -4,6 +4,7 @@
 # Authors:
 #   Benjamin Boudreau <dreurmail@gmail.com>
 #   Sorin Ionescu <sorin.ionescu@gmail.com>
+#   Thierry Ghelew <tlux@ghelew.net>
 #
 # Tips:
 #   https://wiki.archlinux.org/index.php/Pacman_Tips
@@ -22,14 +23,18 @@ fi
 zstyle -s ':prezto:module:pacman' frontend '_pacman_frontend'
 
 if (( $+commands[$_pacman_frontend] )); then
-  alias pacman="$_pacman_frontend"
+    alias pacman="$_pacman_frontend"
 
-  if [[ -s "${0:h}/${_pacman_frontend}.zsh" ]]; then
-    source "${0:h}/${_pacman_frontend}.zsh"
-  fi
+    if zstyle -t ':prezto:module:pacman' frontend-sudo; then
+        _pacman_sudo='sudo '
+    fi
+
+    if [[ -s "${0:h}/${_pacman_frontend}.zsh" ]]; then
+        source "${0:h}/${_pacman_frontend}.zsh"
+    fi
 else
-  _pacman_frontend='pacman'
-  _pacman_sudo='sudo '
+    _pacman_frontend='pacman'
+    _pacman_sudo='sudo '
 fi
 
 #
@@ -37,7 +42,7 @@ fi
 #
 
 # Pacman.
-alias pac="${_pacman_frontend}"
+alias pac="${_pacman_sudo}${_pacman_frontend}"
 
 # Installs packages from repositories.
 alias paci="${_pacman_sudo}${_pacman_frontend} --sync"
@@ -80,5 +85,10 @@ fi
 # Synchronizes the local package database against the repositories then
 # upgrades outdated packages.
 alias pacU="${_pacman_sudo}${_pacman_frontend} --sync --refresh --sysupgrade"
+
+# Synchronizes the local package database against the repositories then
+# list packages to be updated
+alias pacui="${_pacman_sudo}${_pacman_frontend} --sync --refresh &&\
+    ${_pacman_sudo}${_pacman_frontend} --query --upgrades"
 
 unset _pacman_{frontend,sudo}
