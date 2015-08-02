@@ -5,7 +5,5 @@
 # Licence:  GPL2
 ###############################################################################
 # alias run-help built-in
-autoload -U run-help
-[ "$(alias | grep run-help)" ]  && unalias run-help
-[ "$(alias | grep help)" ]  && unalias help
+autoload -Uz run-help
 alias help="run-help"
