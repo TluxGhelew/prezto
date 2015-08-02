@@ -1,0 +1,27 @@
+#
+# Generate an arbitrary length of random characters
+#
+# Authors:
+#   Thierry Ghelew <tlux@ghelew.ch>
+#
+
+if [[ ! $commands[tr] && ! $commands[dd] ]]; then
+    # needed command are not found in path
+    return 1
+fi
+size=${1:-8}
+[[ $size == [24816] ]] || {
+        print "Size: accetped parameter [2 4 8 16] ";return 1
+    }
+
+lenght=${2:-8}
+[[ $lenght == [24816] ]] || { 
+        print "Lenght: accetped parameter [2 4 8 16] ";return 1
+    }
+
+zstyle -s ':prezto:module:utility:zrandom' accetped-char 'chars' || \
+    chars=A-Za-z0-9+!~@
+tr -dc ${chars} < /dev/urandom | dd bs="$size" count="$lenght" 2>/dev/null
+unset size
+unset lenght
+

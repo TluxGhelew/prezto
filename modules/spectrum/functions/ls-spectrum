@@ -1,0 +1,20 @@
+###############################################################################
+# File:     ls-spectrum
+# Version   0.1
+# Author:   Thierry Ghelew <tlux@ghelew.net>
+# Licence:  GPL2
+###############################################################################
+# functions to display the available colors within 'FG' variable
+
+# create an array of all keys in 'FG'
+okeys=()
+for k (${(@kon)FG}) okeys+=$k
+# loop through the created array and print the corresponding color grouped by 5
+for i in {1..${#okeys}}; do
+    printf "%8s %5b " "$okeys[i]:" "$FG[$okeys[$i]]****$FG[none]"
+    if ! (( $i % 5 )); then
+        print
+    fi
+done
+# unset variable
+unset okeys, i

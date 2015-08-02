@@ -1,0 +1,10 @@
+#compdef zrandom
+#autoload
+
+#
+# Completes zrandom
+#
+# Authors:
+#   Thierry Ghelew <tlux@ghelew.ch>
+#
+
