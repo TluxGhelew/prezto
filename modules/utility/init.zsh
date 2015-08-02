@@ -50,6 +50,7 @@ alias _='sudo'
 alias b='${(z)BROWSER}'
 alias cp="${aliases[cp]:-cp} -i"
 alias e='${(z)VISUAL:-${(z)EDITOR}}'
+alias se='_ ${(z)VISUAL:-${(z)EDITOR}}'
 alias ln="${aliases[ln]:-ln} -i"
 alias mkdir="${aliases[mkdir]:-mkdir} -p"
 alias mv="${aliases[mv]:-mv} -i"
@@ -58,6 +59,8 @@ alias po='popd'
 alias pu='pushd'
 alias rm="${aliases[rm]:-rm} -i"
 alias type='type -a'
+alias al="alias"
+alias c="${aliases[clear]:-clear}"
 
 # ls
 if is-callable 'dircolors'; then
