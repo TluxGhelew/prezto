@@ -5,17 +5,17 @@
 #   Thierry Ghelew <tlux@ghelew.ch>
 #
 
-if [[ ! $commands[tr] && ! $commands[dd] ]]; then
+if [[ ! $commands[tr] && ! $commands[dd]  && ! $commands[grep] ]]; then
     # needed command are not found in path
     return 1
 fi
 size=${1:-8}
-[[ $size == [24816] ]] || {
+grep -oE "2|4|8|16" <(echo $size) >/dev/null || {
         print "Size: accetped parameter [2 4 8 16] ";return 1
     }
 
 lenght=${2:-8}
-[[ $lenght == [24816] ]] || { 
+grep -oE "2|4|8|16" <(echo $size) >/dev/nul || { 
         print "Lenght: accetped parameter [2 4 8 16] ";return 1
     }
 
