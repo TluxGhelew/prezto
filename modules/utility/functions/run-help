@@ -1,0 +1,9 @@
+###############################################################################
+# File:     run-help
+# Version   0.1
+# Author:   Thierry Ghelew <tlux@ghelew.net>
+# Licence:  GPL2
+###############################################################################
+# Wrapper both the man and zsh run help command and remove all relared aliases
+autoload -U run-help
+alias help="builtin run-help"
