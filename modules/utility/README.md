@@ -159,6 +159,7 @@ Functions
   - `mkdcd` makes a directory and changes to it.
   - `popdls` pops an entry off the directory stack and lists its contents.
   - `pushdls` pushes an entry onto the directory stack and lists its contents.
+  - `rm` safely delete file(s) and folder(s) with one single confirmation.
 
 ### Developer
 
@@ -174,6 +175,9 @@ Functions
 
   - `prep` provides a grep-like pattern search.
   - `psub` provides a sed-like pattern substitution.
+
+### Miscellaneous
+  - `zrandom` generate a random string of given size * length from a predefined list of characters.
 
 Authors
 -------

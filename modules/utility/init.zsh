@@ -46,6 +46,7 @@ alias scp='noglob scp'
 alias sftp='noglob sftp'
 
 # Define general aliases.
+alias alval='alias | noglob grep -Ei'
 alias _='sudo'
 alias b='${(z)BROWSER}'
 alias cp="${aliases[cp]:-cp} -i"
@@ -57,7 +58,6 @@ alias mv="${aliases[mv]:-mv} -i"
 alias p='${(z)PAGER}'
 alias po='popd'
 alias pu='pushd'
-alias rm="${aliases[rm]:-rm} -i"
 alias type='type -a'
 alias al="alias"
 alias c="${aliases[clear]:-clear}"
@@ -182,6 +182,22 @@ alias http-serve='python -m SimpleHTTPServer'
 #
 # Functions
 #
+
+# Safely delete files with only one confirmation if we are in an non
+# interactive shell
+if [[ -o interactive ]]; then
+    function rm {
+        ls -FCsd "$@"
+        echo 'really remove file(s)? [y/N] ' | tr -d '\n'; read ans
+        if [[ "$ans" == (yes|Yes|YES|y) ]]; then
+            /usr/bin/rm -rf "$@"
+        else
+            echo "cancelled"
+        fi
+    }
+else
+    alias rm="${aliases[rm]:-rm} -i"
+fi
 
 # Makes a directory and changes to it.
 function mkdcd {
