@@ -1,0 +1,256 @@
+# Pure
+# by Sindre Sorhus
+# https://github.com/sindresorhus/pure
+# Adapted by Thierry Ghelew <tlux@ghelew.net>
+# Note: original function name was renamed for the sake of completeness
+# MIT License
+
+# For my own and others sanity
+# git:
+# %b => current branch
+# %a => current action (rebase/merge)
+# prompt:
+# %F => color dict
+# %f => reset color
+# %~ => current path
+# %* => time
+# %n => username
+# %m => shortname host
+# %(?..) => prompt conditional - %(condition.true.false)
+# terminal codes:
+# \e7   => save cursor position
+# \e[2A => move cursor 2 lines up
+# \e[1G => go to position 1 in terminal
+# \e8   => restore cursor position
+# \e[K  => clears everything after the cursor on the current line
+
+
+# Load dependencies.
+pmodload 'helper'
+
+function prompt_tlux_pwd {
+  local pwd="${PWD/#$HOME/~}"
+
+  if [[ "$pwd" == (#m)[/~] ]]; then
+    _prompt_tlux_pwd="$MATCH"
+    unset MATCH
+  else
+    _prompt_tlux_pwd="${${${${(@j:/:M)${(@s:/:)pwd}##.#?}:h}%/}//\%/%%}/${${pwd:t}//\%/%%}"
+  fi
+}
+
+function prompt_tlux_shell {
+    _prompt_tlux_shell=""
+
+    # TODO find a better way to estimate the default level
+    if [[ $SHLVL -gt 3 ]]; then
+        _prompt_tlux_shell=$(( $SHLVL - 2 ))
+    fi
+    #Guard
+    if [[ _prompt_tlux_shell -lt 1 ]]; then
+        _prompt_tlux_shell=""
+    fi
+
+}
+
+# turns seconds into human readable time
+# 165392 => 1d 21h 56m 32s
+# https://github.com/sindresorhus/pretty-time-zsh
+function prompt_tlux_human_time() {
+    echo -n " "
+    local tmp=$1
+    local days=$(( tmp / 60 / 60 / 24 ))
+    local hours=$(( tmp / 60 / 60 % 24 ))
+    local minutes=$(( tmp / 60 % 60 ))
+    local seconds=$(( tmp % 60 ))
+    (( $days > 0 )) && echo -n "${days}d "
+    (( $hours > 0 )) && echo -n "${hours}h "
+    (( $minutes > 0 )) && echo -n "${minutes}m "
+    echo "${seconds}s"
+}
+
+# displays the exec time of the last command if set threshold was exceeded
+function prompt_tlux_check_cmd_exec_time() {
+    local stop=$EPOCHSECONDS
+    local start=${prompt_tlux_cmd_timestamp:-$stop}
+    integer elapsed=$stop-$start
+    (($elapsed > ${PURE_CMD_MAX_EXEC_TIME:=5})) && prompt_tlux_human_time $elapsed
+}
+
+function prompt_tlux_preexec() {
+    prompt_tlux_cmd_timestamp=$EPOCHSECONDS
+    # format current directory
+    # shows the current dir and executed command in the title when a process is active
+    print -Pn "\e]0;"
+    echo -nE "${_prompt_tlux_pwd} $2"
+    print -Pn "\a"
+}
+
+# string length ignoring ansi escapes
+function prompt_tlux_string_length() {
+    # Subtract one since newline is counted as two characters
+    echo $(( ${#${(S%%)1//(\%([KF1]|)\{*\}|\%[Bbkf])}} - 1 ))
+}
+
+function prompt_tlux_preprompt_render() {
+    # check that no command is currently running, the prompt will otherwise be rendered in the wrong place
+    [[ -n ${prompt_tlux_cmd_timestamp+x} && "$1" != "precmd" ]] && return
+
+    prompt_tlux_pwd
+    # get shell level
+    prompt_tlux_shell
+
+    # construct prompt, beginning with path
+    local prompt="%F{blue}${_prompt_tlux_pwd}%f"
+    # git info
+    prompt+="$prompt_tlux_git_status"
+    # username and machine if applicable
+    prompt+=$prompt_tlux_username
+    # execution time
+    prompt+="%F{yellow}${prompt_tlux_cmd_exec_time}%f"
+
+    # if executing through precmd, do not perform fancy terminal editing
+    if [[ "$1" == "precmd" ]]; then
+        print -P "\n${prompt}"
+    else
+        # only redraw if prompt has changed
+        [[ "${prompt_tlux_last_preprompt}" != "${prompt}" ]] || return
+
+        # calculate length of prompt for redraw purposes
+        local prompt_length=$(prompt_tlux_string_length $prompt)
+        local lines=$(( $prompt_length / $COLUMNS + 1 ))
+
+        # disable clearing of line if last char of prompt is last column of terminal
+        local clr="\e[K"
+        (( $prompt_length * $lines == $COLUMNS - 1 )) && clr=""
+
+        # modify previous prompt
+        print -Pn "\e7\e[${lines}A\e[1G${prompt}${clr}\e8"
+    fi
+
+    # store previous prompt for comparison
+    prompt_tlux_last_preprompt=$prompt
+}
+
+function prompt_tlux_precmd() {
+    # store exec time for when preprompt gets re-rendered
+    prompt_tlux_cmd_exec_time=$(prompt_tlux_check_cmd_exec_time)
+
+    # by making sure that prompt_tlux_cmd_timestamp is defined here the async functions are prevented from interfering
+    # with the initial preprompt rendering
+    prompt_tlux_cmd_timestamp=
+
+    # preform async git dirty check and fetch
+    prompt_tlux_async_tasks
+
+    # print the preprompt
+    prompt_tlux_preprompt_render "precmd"
+
+    # remove the prompt_tlux_cmd_timestamp, indicating that precmd has completed
+    unset prompt_tlux_cmd_timestamp
+}
+
+function prompt_tlux_precmd_async {
+  # Get Git repository information.
+  if (( $+functions[git-info] )); then
+    cd "$1"
+    git-info
+    typeset -p git_info >! "$_prompt_tlux_precmd_async_data"
+  fi
+}
+
+
+function prompt_tlux_async_tasks() {
+    # initialize async worker
+    ((!${prompt_tlux_async_init:-0})) && {
+        async_start_worker "prompt_tlux" -u -n
+        async_register_callback "prompt_tlux" prompt_tlux_async_callback
+        prompt_tlux_async_init=1
+    }
+
+    # tell worker to do a git fetch
+    async_job "prompt_tlux" prompt_tlux_precmd_async "${PWD}"
+}
+
+function prompt_tlux_async_callback() {
+    local job=$1
+    local output=$3
+    local exec_time=$4
+
+    case "${job}" in
+        prompt_tlux_precmd_async)
+            if [[ -s "$_prompt_tlux_precmd_async_data" ]]; then
+                alias typeset='typeset -g'
+                source "$_prompt_tlux_precmd_async_data"
+                prompt_tlux_git_status="${git_info:+${(e)git_info[status]}}"
+                unalias typeset
+                prompt_tlux_preprompt_render
+            fi
+            ;;
+    esac
+}
+
+function prompt_tlux_setup() {
+    # prevent percentage showing up
+    # if output doesn't end with a newline
+    export PROMPT_EOL_MARK=''
+
+    prompt_opts=(cr subst percent)
+    _prompt_tlux_precmd_async_data="${TMPPREFIX}-prompt_tlux_data"
+
+    zmodload zsh/datetime
+    autoload -Uz add-zsh-hook
+    autoload -Uz async && async
+
+    add-zsh-hook precmd prompt_tlux_precmd
+    add-zsh-hook preexec prompt_tlux_preexec
+
+
+    # Set editor-info parameters.
+    zstyle ':prezto:module:editor:info:completing' format '%B%F{7}...%f%b'
+    zstyle ':prezto:module:editor:info:keymap:primary' format ' %B%F{1}❯%F{3}❯%F{2}❯%f%b'
+    zstyle ':prezto:module:editor:info:keymap:primary:overwrite' format ' %F{3}♺%f'
+    zstyle ':prezto:module:editor:info:keymap:alternate' format ' %B%F{2}❮%F{3}❮%F{1}❮%f%b'
+
+    # Set git-info parameters.
+    zstyle ':prezto:module:git:info' verbose 'yes'
+    zstyle ':prezto:module:git:info:action' format '%F{7}:%f%%B%F{9}%s%f%%b'
+    zstyle ':prezto:module:git:info:added' format ' %%B%F{2}✚%f%%b'
+    zstyle ':prezto:module:git:info:ahead' format ' %%B%F{13}⬆%f%%b'
+    zstyle ':prezto:module:git:info:behind' format ' %%B%F{13}⬇%f%%b'
+    zstyle ':prezto:module:git:info:branch' format ' %%B%F{2}λ:%b%f%%b'
+    zstyle ':prezto:module:git:info:commit' format ' %%B%F{3}%.7c%f%%b'
+    zstyle ':prezto:module:git:info:deleted' format ' %%B%F{1}✖%f%%b'
+    zstyle ':prezto:module:git:info:modified' format ' %%B%F{4}✱%f%%b'
+    zstyle ':prezto:module:git:info:position' format ' %%B%F{13}%p%f%%b'
+    zstyle ':prezto:module:git:info:renamed' format ' %%B%F{5}➜%f%%b'
+    zstyle ':prezto:module:git:info:stashed' format ' %%B%F{6}✭%f%%b'
+    zstyle ':prezto:module:git:info:unmerged' format ' %%B%F{3}═%f%%b'
+    zstyle ':prezto:module:git:info:untracked' format ' %%B%F{7}◼%f%%b'
+    zstyle ':prezto:module:git:info:keys' format \
+    'status' '$(coalesce "%b" "%p" "%c")%s%A%B%S%a%d%m%r%U%u'
+
+    # show username@host if logged in through SSH
+    [[ "$SSH_CONNECTION" != '' ]] && prompt_tlux_username=' %F{242}%n@%m%f'
+
+    # show username@host if root, with username in white
+    [[ $UID -eq 0 ]] && prompt_tlux_username=' %F{red}%n%f%F{242}@%m%f'
+
+    # prompt turns red if the previous command didn't exit with 0
+    PROMPT='${editor_info[overwrite]}'
+    PROMPT+='%B%F{3}${_prompt_tlux_shell:+"($_prompt_tlux_shell)"}%b%f'
+    PROMPT+='%(?:: %F{1}✗%f)${editor_info[keymap]} '
+    RPROMPT=''
+    SPROMPT='zsh: correct %F{1}%R%f to %F{2}%r%f [nyae]? '
+}
+
+function prompt_tlux_preview {
+  local +h PROMPT=''
+  local +h RPROMPT=''
+  local +h SPROMPT=''
+
+  editor-info 2>/dev/null
+  prompt_preview_theme 'tlux'
+}
+
+prompt_tlux_setup "$@"
