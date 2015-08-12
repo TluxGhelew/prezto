@@ -46,7 +46,6 @@ alias scp='noglob scp'
 alias sftp='noglob sftp'
 
 # Define general aliases.
-alias alval='alias | noglob grep -Ei'
 alias _='sudo'
 alias b='${(z)BROWSER}'
 alias cp="${aliases[cp]:-cp} -i"
@@ -238,3 +237,10 @@ find-in-files(){
 function psu {
   ps -U "${1:-$LOGNAME}" -o 'pid,%cpu,%mem,command' "${(@)argv[2,-1]}"
 }
+
+# Diplay value of an alias
+alval() {
+    query="${@}"
+    alias | grep -Ei --color=auto "$query"
+}
+alias alval="noglob alval"
