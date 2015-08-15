@@ -20,7 +20,7 @@ alias pacmy="pacm -y"
 alias paca="${_pacman_sudo}${_pacman_frontend} -A"
 
 # install aur package with more verbosity
-alias pacav="paca -vx"
+alias pacav="paca -avx"
 
 # edit pkgbuild and install aur package
 alias pacae="paca --hot-edit"
