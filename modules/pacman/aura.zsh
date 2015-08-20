@@ -23,7 +23,7 @@ alias paca="${_pacman_sudo}${_pacman_frontend} -A"
 alias pacav="paca -avx"
 
 # edit pkgbuild and install aur package
-alias pacae="paca --hot-edit"
+alias pacae="pacav --hotedit"
 
 # search aur packages
 alias pacas="paca -s"
