@@ -1,0 +1,45 @@
+#
+# Displays top n(<20) memory or cpu usage
+#
+# Authors:
+#       Thierry Ghelew <tlux@ghelew.net>
+#
+
+local usage
+typeset -A options
+
+usage="$(
+cat <<EOF
+usage: $0 [-l] [-s m|p]
+
+options:
+  -l    Number of processes status to return default 10 maximum 20
+  -s    Sort order which is either cpu [p] or memory [m]
+  -u    Display user owned processes status
+EOF
+)"
+
+options=(-l 10 -s m -u "$LOGNAME")
+
+zparseopts -D -K -A options l: s: u:
+
+if (( $# > 0 )); then
+  print "$usage" >&2
+  return 1
+fi
+
+[[ -n ${options[-l]} && ${options[-l]} -gt 20 ]] && \
+    print "Number of processes status to return is not valid!\n$usage" && return 1
+[[ -n ${options[-s]} && ${options[-s]} != (m|p) ]] && \
+    print "Sort order is not valid!\n$usage" && return 1 
+[[ -n ${options[-u]} ]] && ! $(grep -q "${options[-u]}" /etc/passwd) && \
+    print "User does not exists!\n$usage" && return 1 
+
+ps -U "${options[-u]}" -o "pid,%mem,%cpu,bsdtime,comm" -k "-${${options[-s]/m/%mem}/p/%cpu}"| \
+    awk -v lenght=$(( ${options[-l]} + 1 ))\
+    'NR==1{printf("%8s|%5s|%5s|%7s| %s\n",$1,$2,$3,$4,$5);next}
+    {
+        printf("%8s|%5s|%5s|%7s| %s\n",$1,$2,$3,$4,$5)  | "head -n "lenght""
+    }'
+
+unset options
