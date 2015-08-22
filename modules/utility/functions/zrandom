@@ -5,23 +5,43 @@
 #   Thierry Ghelew <tlux@ghelew.ch>
 #
 
+local size lenght usage
+
+usage="$(
+cat <<EOF
+$FG[red]$FX[bold]usage: $0 [bsize] [count]$FG[none]
+
+$FG[red]Generate an abitrary lenght of random characters.$FG[none] 
+The lenght of the generated characters are the product of [bsize] and [count].
+Both the block size and count is limited to: $FG[green]<2 4 8 16>.$FG[none]
+The produced characters are chosen from $FG[green]':prezto:module:utility:zrandom accetped-char'$FG[none]
+which is set by default to $FG[green]'A-Za-z0-9+!~@'$FG[none]
+
+parameters:
+  bsize     Block size - the size of each block of random chars
+  count     Count - the count of the block size such as: output_chars = bsize*count
+EOF
+)"
+
 if [[ ! $commands[tr] && ! $commands[dd]  && ! $commands[grep] ]]; then
     # needed command are not found in path
     return 1
 fi
+if (( $# > 2 )); then
+    print $usage >&2
+    return 1
+fi
+
 size=${1:-8}
-grep -oE "2|4|8|16" <(echo $size) >/dev/null || {
-        print "Size: accetped parameter [2 4 8 16] ";return 1
+lenght=${2:-8}
+grep -oqE "2|4|8|16" <(echo $size) || {
+        print "Size: accetped parameter [2 4 8 16]\n"$usage && return 1
     }
 
-lenght=${2:-8}
-grep -oE "2|4|8|16" <(echo $size) >/dev/nul || { 
-        print "Lenght: accetped parameter [2 4 8 16] ";return 1
+grep -oqE "2|4|8|16" <(echo $lenght) || {
+        print "Lenght: accetped parameter [2 4 8 16]\n"$usage && return 1
     }
 
 zstyle -s ':prezto:module:utility:zrandom' accetped-char 'chars' || \
     chars=A-Za-z0-9+!~@
 tr -dc ${chars} < /dev/urandom | dd bs="$size" count="$lenght" 2>/dev/null
-unset size
-unset lenght
-

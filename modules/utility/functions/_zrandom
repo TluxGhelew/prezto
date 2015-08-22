@@ -7,4 +7,19 @@
 # Authors:
 #   Thierry Ghelew <tlux@ghelew.ch>
 #
+local context state line valid
+valid=(2 4 8 16)
 
+_arguments \
+  '1: :->bsize' \
+  '2: :->count' \
+  && return 0
+
+case $state in
+    (bsize)  
+        _describe 'block size' valid  -V valid && return 0
+        ;;
+    (count)  
+        _describe 'count' valid  -V valid && return 0
+        ;;
+esac
