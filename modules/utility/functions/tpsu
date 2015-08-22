@@ -28,7 +28,7 @@ if (( $# > 0 )); then
   return 1
 fi
 
-[[ -n ${options[-l]} && ${options[-l]} -gt 20 ]] && \
+[[ ${options[-l]} != <1-20> ]] && \
     print "Number of processes status to return is not valid!\n$usage" && return 1
 [[ -n ${options[-s]} && ${options[-s]} != (m|p) ]] && \
     print "Sort order is not valid!\n$usage" && return 1 
@@ -36,10 +36,10 @@ fi
     print "User does not exists!\n$usage" && return 1 
 
 ps -U "${options[-u]}" -o "pid,%mem,%cpu,bsdtime,comm" -k "-${${options[-s]/m/%mem}/p/%cpu}"| \
-    awk -v lenght=$(( ${options[-l]} + 1 ))\
+    awk -v lenght=${options[-l]}\
     'NR==1{printf("%8s|%5s|%5s|%7s| %s\n",$1,$2,$3,$4,$5);next}
     {
-        printf("%8s|%5s|%5s|%7s| %s\n",$1,$2,$3,$4,$5)  | "head -n "lenght""
+        printf("%8s|%5s|%5s|%7s| %s\n",$1,$2,$3,$4,$5)  | "head -qn "lenght""
     }'
 
 unset options

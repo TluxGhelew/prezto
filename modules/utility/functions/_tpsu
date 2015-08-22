@@ -1,0 +1,22 @@
+#compdef tpsu
+#autoload
+
+#
+# Completes tpsu.
+#
+# Authors:
+#    Thierry Ghelew <tlux@ghelew.net>
+#
+local context state line
+_arguments -s :\
+    '-l[number of processes status to return]: :->lines' \
+  '-s[sort order cpu (p) or memory (m)]:sort order:((m\:\%memory p\:\%cpu))' \
+  '-u[display user owned processes status]:list of users:($(cut -d\: -f1 /etc/passwd))' \
+  && return 0
+
+case $state in
+    (lines)  
+        local numbers; numbers=({1..20})
+        _describe 'number of lines' numbers  -V numbers && return 0
+        ;;
+esac
