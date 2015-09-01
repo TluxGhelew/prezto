@@ -1,6 +1,6 @@
 ###############################################################################
 # File:     init.zsh
-# Version   0.1
+# Version   0.2
 # Author:   Robby Russel <http://github.com/robbyrussel>
 # Author:   Thierry Ghelew <tlux@ghelew.net>
 # Licence:  MIT (following Robby Russel licenses)
@@ -9,7 +9,7 @@
 
 user_commands=(
   list-units is-active status show help list-unit-files
-  is-enabled list-jobs show-environment)
+  is-enabled list-jobs show-environment list-timers)
 
 sudo_commands=(
   start stop reload restart try-restart isolate kill
