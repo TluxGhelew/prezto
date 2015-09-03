@@ -85,6 +85,12 @@ if is-at-least 5.0.8; then
     zle -N delete-surround surround
     zle -N add-surround surround
     zle -N change-surround surround
+
+    # Handle surroung keys
+    bindkey -M visual S add-surround
+    bindkey -a cs change-surround
+    bindkey -a ds delete-surround
+    bindkey -a ys add-surround
 fi
 unfunction is-at-least 
 
@@ -268,11 +274,6 @@ else
   bindkey -M vicmd "?" history-incremental-search-backward
   bindkey -M vicmd "/" history-incremental-search-forward
 fi
-# Handle surroung keys
-bindkey -M visual S add-surround
-bindkey -a cs change-surround
-bindkey -a ds delete-surround
-bindkey -a ys add-surround
 
 #
 # Emacs and Vi Key Bindings
