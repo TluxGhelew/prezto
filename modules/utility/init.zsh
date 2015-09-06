@@ -190,7 +190,7 @@ if [[ -o interactive ]]; then
         ls -FCsd "$@"
         echo 'really remove file(s)? [y/N] ' | tr -d '\n'; read ans
         if [[ "$ans" == (yes|Yes|YES|y) ]]; then
-            /usr/bin/rm -rf "$@"
+            /bin/rm -rf "$@"
         else
             echo "cancelled"
         fi
