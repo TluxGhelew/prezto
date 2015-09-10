@@ -23,7 +23,7 @@ parameters:
 EOF
 )"
 
-if [[ ! $commands[tr] && ! $commands[dd]  && ! $commands[grep] ]]; then
+if (( ! ${+commands[tr]} && ! ${+commands[dd]}  && ! ${+commands[grep]} )); then
     # needed command are not found in path
     return 1
 fi
