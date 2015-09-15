@@ -43,8 +43,9 @@ function prompt_tlux_shell {
     _prompt_tlux_shell=""
 
     # TODO find a better way to estimate the default level
-    if [[ $SHLVL -gt 3 ]]; then
-        _prompt_tlux_shell=$(( $SHLVL - 2 ))
+    local level=$([[ ${+DISPLAY} -eq 1 ]] && echo 3 || echo 1)
+    if [[ $SHLVL -gt $level ]]; then
+        _prompt_tlux_shell=$(( $SHLVL - $level ))
     fi
     #Guard
     if [[ _prompt_tlux_shell -lt 1 ]]; then
