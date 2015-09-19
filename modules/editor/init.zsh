@@ -104,6 +104,7 @@ function editor-info {
   # Clean up previous $editor_info.
   unset editor_info
   typeset -gA editor_info
+  local REPLY
 
   if [[ "$KEYMAP" == 'vicmd' ]]; then
     zstyle -s ':prezto:module:editor:info:keymap:alternate' format 'REPLY'
