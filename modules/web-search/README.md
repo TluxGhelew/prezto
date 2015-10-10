@@ -10,6 +10,7 @@ Aliases
   - `google`  open a browser with a google search
   - `yahoo`   open a browser with a yahoo search
   - `ddg`     open a browser with a duckduckgo search
+  - `qw`      open a browser with a lite qwant search
   - `yandex`  open a browser with a yandex search
   - `github`  open a browser with a github search
   - `wiki`    open a browser with a wikipedia search on duckduckgo

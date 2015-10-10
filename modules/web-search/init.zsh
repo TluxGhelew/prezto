@@ -14,6 +14,7 @@ alias bing='web-search bing'
 alias google='web-search google'
 alias yahoo='web-search yahoo'
 alias ddg='web-search duckduckgo'
+alias qw='web-search qwant'
 alias yandex='web-search yandex'
 alias github='web-search github'
 
