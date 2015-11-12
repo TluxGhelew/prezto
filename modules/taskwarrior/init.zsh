@@ -12,6 +12,7 @@ alias t='task'
 alias tin='t +in add'
 alias tthink='tickle +1d'
 alias tsomeday='t +someday wait:someday add'
+alias tsync="t sync"
 
 function tmodify() {
     local id=$1

@@ -12,6 +12,7 @@ Aliases
   - `tmod`      modify a task
   - `tthink`    create a task that would make you think about it a day later. The answer should always be yes or no!
   _ `tsomeday`  list all task that are flag as someday. those tasks never appear in the `task next` query.
+  - `tsync`     sync task to the configured sync server
 
 
 [1]: https://en.wikipedia.org/wiki/Getting_Things_Done
