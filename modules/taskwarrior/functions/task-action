@@ -1,0 +1,19 @@
+###############################################################################
+# File:     task-action
+# Version   0.1
+# Author:   Thierry Ghelew <tlux@ghelew.net>
+# Licence:  GPLv2
+###############################################################################
+# task-action <id> <action> <parameter>
+if (( ! $+commands[task] )); then
+    return 1
+fi
+
+id=$1
+action=$2
+shift
+
+task $id $action $@
+unset id action
+
+

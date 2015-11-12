@@ -1,0 +1,15 @@
+###############################################################################
+# File:     tickle
+# Version   0.1
+# Author:   Thierry Ghelew <tlux@ghelew.net>
+# Licence:  GPLv2
+###############################################################################
+# tickle <deadline> <parameter>
+
+deadline=$1
+shift
+
+task +in +tickle wait:$deadline add $@
+unset deadline
+
+
