@@ -1,6 +1,6 @@
 ###############################################################################
 # File:     task-action
-# Version   0.1
+# Version   0.2
 # Author:   Thierry Ghelew <tlux@ghelew.net>
 # Licence:  GPLv2
 ###############################################################################
@@ -8,12 +8,6 @@
 if (( ! $+commands[task] )); then
     return 1
 fi
-
-id=$1
-action=$2
-shift
-
-task $id $action $@
-unset id action
+task $1 $2 ${argv[3,-1]}
 
 

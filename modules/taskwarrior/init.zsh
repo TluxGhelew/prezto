@@ -1,6 +1,6 @@
 ###############################################################################
 # File:     init.zsh
-# Version   0.1
+# Version   0.2
 # Author:   Thierry Ghelew <tlux@ghelew.net>
 # Licence:  GPLv2
 ###############################################################################
@@ -15,22 +15,16 @@ alias tsomeday='t +someday wait:someday add'
 alias tsync="t sync"
 
 function tmodify() {
-    local id=$1
-    shift
-    task-action $id modify $@
+    task-action $1 modify ${argv[2,-1]}
 }
 alias tmod='tmodify'
 
 function tdone() {
-    local id=$1
-    shift
-    task-action $id done $@
+    task-action $1 done ${argv[2,-1]}
 }
 
 function tdelete() {
-    local id=$1
-    shift
-    task-action $id delete $@
+    task-action $1 delete ${argv[2,-1]}
 }
 alias tdel='tdelete'
 
