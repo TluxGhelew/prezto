@@ -72,7 +72,11 @@ if is-callable 'dircolors'; then
     if [[ -s "$HOME/.dir_colors" ]]; then
       eval "$(dircolors --sh "$HOME/.dir_colors")"
     else
-      eval "$(dircolors --sh)"
+        if [[ -s "/etc/DIR_COLORS" ]]; then
+            eval "$(dircolors --sh /etc/DIR_COLORS)"
+        else
+            eval "$(dircolors --sh)"
+        fi
     fi
 
     alias ls="${aliases[ls]:-ls} --color=auto"
