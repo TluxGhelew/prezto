@@ -1,3 +1,4 @@
+#-*- mode: shell-script -*-
 # Pure
 # by Sindre Sorhus
 # https://github.com/sindresorhus/pure
@@ -42,8 +43,9 @@ function prompt_tlux_pwd {
 function prompt_tlux_shell {
     _prompt_tlux_shell=""
 
-    # TODO find a better way to estimate the default level
-    local level=$([[ ${+DISPLAY} -eq 1 ]] && echo 3 || echo 1)
+    # NOTE This was a linux hack, since I am mainly on BSD*
+    # local level=$([[ ${+DISPLAY} -eq 1 ]] && echo 3 || echo 1)
+    local level=1
     if [[ $SHLVL -gt $level ]]; then
         _prompt_tlux_shell=$(( $SHLVL - $level ))
     fi

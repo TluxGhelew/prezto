@@ -216,7 +216,7 @@ zle -N expand-or-complete-with-indicator
 function prepend-sudo {
   [[ -z $BUFFER ]] && zle up-history
   if [[ "$BUFFER" != su(do|)\ * ]]; then
-    BUFFER="sudo $BUFFER"
+    BUFFER="_ $BUFFER"
     (( CURSOR += 5 ))
   fi
 }

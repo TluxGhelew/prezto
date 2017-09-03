@@ -55,7 +55,11 @@ alias b='${(z)BROWSER}'
 alias cp="${aliases[cp]:-cp} -i"
 alias ve='${(z)VISUAL:-${(z)EDITOR}}'
 alias e='${(z)EDITOR}'
-alias ln="${aliases[ln]:-ln} -i"
+if [[ "$OSTYPE" == openbsd* ]]; then
+    alias ln="${aliases[ln]:-ln}"
+else
+    alias ln="${aliases[ln]:-ln} -i"
+fi
 alias mkdir="${aliases[mkdir]:-mkdir} -p"
 alias mv="${aliases[mv]:-mv} -i"
 alias p='${(z)PAGER}'
@@ -94,6 +98,9 @@ else
     # Define colors for the completion system.
     export LS_COLORS='di=34:ln=35:so=32:pi=33:ex=31:bd=36;01:cd=33;01:su=31;40;07:sg=36;40;07:tw=32;40;07:ow=33;40;07:'
 
+    if (( $+commands[colorls])); then
+        alias ls=colorls
+    fi
     alias ls="${aliases[ls]:-ls} -G"
   else
     alias ls="${aliases[ls]:-ls} -F"
@@ -250,6 +257,6 @@ function psu {
 # Diplay value of an alias
 alval() {
     query="${@}"
-    alias | grep -Ei --color=auto "$query"
+    alias | grep -Ei "$query"
 }
 alias alval="noglob alval"
