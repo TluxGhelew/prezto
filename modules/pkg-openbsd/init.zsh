@@ -31,5 +31,8 @@ alias pkgda="noglob fpkg_delete_all"
 fpkg_delete_all(){
     pkgd $* && pkgd -a
 }
-
 unset _super
+# pkg_locate databases/pkglocatedb
+(( ! $+commands[pkg_locate])) && return 0
+
+alias pkgloc="pkg_locate"
