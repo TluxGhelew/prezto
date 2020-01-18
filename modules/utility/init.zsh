@@ -31,7 +31,7 @@ alias man='nocorrect man'
 alias mkdir='nocorrect mkdir'
 alias mv='nocorrect mv'
 alias mysql='nocorrect mysql'
-alias rm='nocorrect rm'
+alias rm="nocorrect $(which rm)"
 
 # Disable globbing.
 alias bower='noglob bower'
@@ -190,7 +190,7 @@ alias http-serve='python -m SimpleHTTPServer'
 # Safely delete files with only one confirmation if we are in an non
 # interactive shell
 if [[ -o interactive ]]; then
-    function rm {
+    function rmi {
         ls -FCsd "$@"
         echo 'really remove file(s)? [y/N] ' | tr -d '\n'; read ans
         if [[ "$ans" == (yes|Yes|YES|y) ]]; then
